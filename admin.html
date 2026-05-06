@@ -2,61 +2,45 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم حبه بن</title>
+    <title>لوحة تحكم حبه بن - إدارة الأصناف</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: right; }
-        .container { max-width: 500px; background: white; padding: 20px; border-radius: 10px; margin: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #3d2b1f; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-save { background: #3d2b1f; color: white; }
-        .btn-fast { background: #f39c12; color: white; margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; text-align: right; }
+        .container { max-width: 500px; background: white; padding: 25px; border-radius: 12px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h3 { text-align: center; color: #3d2b1f; border-bottom: 2px solid #f39c12; padding-bottom: 10px; }
+        input, select, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem; }
+        button { background: #3d2b1f; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        button:hover { background: #5d4037; }
+        .btn-fast { background: #e67e22; margin-top: 25px; border: 2px solid #d35400; }
+        .section-title { margin-top: 20px; font-weight: bold; color: #d35400; display: block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>☕ إدارة متجر حبه بن</h2>
+    <h3>إدارة منيو حبه بن ☕</h3>
     
-    <label>القسم:</label>
-    <select id="p-cat">
-        <option value="coffee">بن مطحون</option>
-        <option value="flavors">بن نكهات</option>
-        <option value="nescafe">نسكافيه</option>
+    <span class="section-title">إضافة صنف يدوي:</span>
+    <select id="cat">
+        <option value="قهوة">بن مطحون</option>
+        <option value="نكهات">بن نكهات</option>
+        <option value="نسكافيه">نسكافيه</option>
     </select>
+    <input type="text" id="name" placeholder="اسم الصنف (مثلاً: بن فاتح محوج)">
+    <input type="number" id="price" placeholder="السعر (ج.م)">
+    <input type="text" id="weight" placeholder="الوزن" value="1/4 ك">
 
-    <label>اسم الصنف:</label>
-    <input type="text" id="p-name" placeholder="مثلاً: بن اسبيشيال فاتح">
+    <button onclick="add()">حفظ الصنف 💾</button>
 
-    <label>السعر الحالي (ج.م):</label>
-    <input type="number" id="p-price" placeholder="140">
-
-    <label>السعر قبل الخصم (اختياري):</label>
-    <input type="number" id="p-old" placeholder="160">
-
-    <label>الوزن:</label>
-    <select id="p-weight">
-        <option value="ربع كيلو">ربع كيلو</option>
-        <option value="نص كيلو">نص كيلو</option>
-        <option value="كيلو">كيلو</option>
-    </select>
-
-    <label>الحالة في المخزن:</label>
-    <select id="p-status">
-        <option value="available">متوفر</option>
-        <option value="out">نفذت الكمية</option>
-    </select>
-
-    <button class="btn-save" onclick="save()">💾 تحديث / إضافة الصنف</button>
-    <button class="btn-fast" onclick="fastUpload()">🚀 رفع المنيو الأساسية (ربع كيلو)</button>
+    <hr style="margin: 30px 0;">
+    
+    <span class="section-title">التشغيل الذكي:</span>
+    <p style="font-size: 0.85rem; color: #666;">سيتم رفع "الساده" و "المحوج" كأصناف منفصلة بناءً على قائمة الأسعار.</p>
+    <button class="btn-fast" onclick="fastUploadMenu()">🚀 رفع المنيو الكاملة (ساده ومحوج)</button>
 </div>
 
 <script>
-    // بيانات الربط الخاصة بك
     const firebaseConfig = {
         apiKey: "AIzaSyDHuRCchoNyx7Zx4T0OB_ayi_m2X83018E",
         authDomain: "habbat-bun-store.firebaseapp.com",
@@ -65,49 +49,60 @@
         messagingSenderId: "685516631891",
         appId: "1:685516631891:web:947262df61561c2dabfba6"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // دالة الحفظ
-    async function save() {
-        const name = document.getElementById('p-name').value;
-        const price = document.getElementById('p-price').value;
-        const oldPrice = document.getElementById('p-old').value;
-        const status = document.getElementById('p-status').value;
-        const cat = document.getElementById('p-cat').value;
-        const weight = document.getElementById('p-weight').value;
+    async function add() {
+        const n = document.getElementById('name').value;
+        const p = document.getElementById('price').value;
+        const c = document.getElementById('cat').value;
+        const w = document.getElementById('weight').value;
 
-        if (!name || !price) return alert("يا هندسة لازم تكتب الاسم والسعر!");
+        if(!n || !p) return alert("برجاء إدخال البيانات كاملة");
 
-        try {
-            await db.collection("products").doc(name).set({
-                name: name,
-                price: parseInt(price),
-                oldPrice: oldPrice ? parseInt(oldPrice) : null,
-                status: status,
-                category: cat,
-                weight: weight
-            });
-            alert("تم حفظ " + name + " بنجاح!");
-        } catch (e) {
-            alert("حصل خطأ: " + e.message);
-        }
+        await db.collection("منتجات").doc(n).set({
+            "اسم": n, "سعر": parseInt(p), "فئة": c, "الوزن": w, "حالة": "متاح"
+        });
+        alert("تم الحفظ!");
     }
 
-    // دالة الرفع السريع
-    async function fastUpload() {
-        const initialMenu = [
-            {name: "بن اسبيشيال فاتح", price: 140, oldPrice: 160, category: "coffee", weight: "ربع كيلو", status: "available"},
-            {name: "بن روقان وسط", price: 150, oldPrice: 180, category: "coffee", weight: "ربع كيلو", status: "available"}
+    async function fastUploadMenu() {
+        const fullMenu = [
+            // بن مطحون - ســــاده
+            { "اسم": "بن اسبيشيال فاتح (ساده)", "سعر": 140, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن صحصحة وسط (ساده)", "سعر": 170, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن الروقان وسط (ساده)", "سعر": 150, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن الكيف وسط (ساده)", "سعر": 150, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن مزاج فاتح (ساده)", "سعر": 140, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن غامق (ساده)", "سعر": 140, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+
+            // بن مطحون - محــــوج
+            { "اسم": "بن اسبيشيال فاتح (محوج)", "سعر": 160, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن صحصحة وسط (محوج)", "سعر": 190, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن الروقان وسط (محوج)", "سعر": 160, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن الكيف وسط (محوج)", "سعر": 165, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن مزاج فاتح (محوج)", "سعر": 150, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن غامق (محوج)", "سعر": 150, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "اسبريسو", "سعر": 170, "فئة": "قهوة", "الوزن": "1/4 ك", "حالة": "متاح" },
+
+            // بن نكهات
+            { "اسم": "بن فرنساوي", "سعر": 110, "فئة": "نكهات", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن بندق", "سعر": 110, "فئة": "نكهات", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن بندق قطع", "سعر": 130, "فئة": "نكهات", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "بن شيكولاتة", "سعر": 110, "فئة": "نكهات", "الوزن": "1/4 ك", "حالة": "متاح" },
+
+            // نسكافيه
+            { "اسم": "نسكافيه بلاك", "سعر": 250, "فئة": "نسكافيه", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "نسكافيه جولد", "سعر": 300, "فئة": "نسكافيه", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "نسكافيه 3*1", "سعر": 100, "فئة": "نسكافيه", "الوزن": "1/4 ك", "حالة": "متاح" },
+            { "اسم": "نسكافيه 3*1 روقان", "سعر": 120, "فئة": "نسكافيه", "الوزن": "1/4 ك", "حالة": "متاح" }
         ];
 
-        for(let item of initialMenu) {
-            await db.collection("products").doc(item.name).set(item);
+        for(let item of fullMenu) {
+            await db.collection("منتجات").doc(item["اسم"]).set(item);
         }
-        alert("تم رفع المنيو الأساسية بنجاح!");
+        alert("تم رفع المنيو كاملة بنجاح (ساده ومحوج) ✅");
     }
 </script>
-
 </body>
 </html>
