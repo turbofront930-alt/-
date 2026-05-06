@@ -1,80 +1,31 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>لوحة تحكم حبه بن</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <style>
-        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; padding: 20px; direction: rtl; }
-        .box { background: #fff; padding: 25px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2D1B13; }
-        input, select, label { width: 100%; display: block; margin-top: 10px; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: #2D1B13; color: #C5A059; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
-    </style>
-</head>
-<body>
-
-<div class="box">
-    <h2>إدارة حبه بن ☕</h2>
-    <label>القسم:</label>
-    <select id="p-cat">
-        <option value="coffee">بن مطحون</option>
-        <option value="flavors">بن نكهات</option>
-        <option value="nescafe">نسكافيه</option>
-    </select>
-    
-    <label>اسم الصنف:</label>
-    <input type="text" id="p-name" placeholder="مثلاً: بن فاتح">
-    
-    <label>السعر الحالي:</label>
-    <input type="number" id="p-price" placeholder="السعر الذي سيتم البيع به">
-    
-    <label>السعر قبل الخصم (اختياري):</label>
-    <input type="number" id="p-old" placeholder="سيبه فاضي لو مفيش خصم">
-    
-    <label>الحالة في المخزن:</label>
-    <select id="p-status">
-        <option value="available">متوفر (Available)</option>
-        <option value="out">خلصان (Out of Stock)</option>
-    </select>
-    
-    <button class="btn" onclick="save()">تحديث / إضافة الصنف</button>
-</div>
+<label>الوزن / الحجم:</label>
+<select id="p-weight">
+    <option value="ربع كيلو">ربع كيلو</option>
+    <option value="نص كيلو">نص كيلو</option>
+    <option value="كيلو كامل">كيلو كامل</option>
+</select>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDHuRCchoNyx7Zx4T0OB_ayi_m2X83018E",
-        authDomain: "habbat-bun-store.firebaseapp.com",
-        projectId: "habbat-bun-store",
-        storageBucket: "habbat-bun-store.firebasestorage.app",
-        messagingSenderId: "685516631891",
-        appId: "1:685516631891:web:947262df61561c2dabfba6"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
+    // تعديل دالة save لتشمل الوزن
     function save() {
         const name = document.getElementById('p-name').value;
         const price = document.getElementById('p-price').value;
         const oldPrice = document.getElementById('p-old').value;
         const status = document.getElementById('p-status').value;
         const cat = document.getElementById('p-cat').value;
+        const weight = document.getElementById('p-weight').value; // الخانة الجديدة
 
         if(!name || !price) return alert("املا البيانات يا هندسة");
 
         db.collection("products").doc(name).set({
-            name, price: parseInt(price), oldPrice: oldPrice ? parseInt(oldPrice) : null,
-            status, category: cat
+            name, 
+            price: parseInt(price), 
+            oldPrice: oldPrice ? parseInt(oldPrice) : null,
+            status, 
+            category: cat,
+            weight: weight // حفظ الوزن في السيرفر
         }).then(() => {
             alert("تم التحديث بنجاح!");
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-price').value = '';
-            document.getElementById('p-old').value = '';
         });
     }
 </script>
-</body>
-</html>
