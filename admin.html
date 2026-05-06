@@ -2,36 +2,46 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة حبه بن</title>
+    <title>لوحة تحكم حبه بن</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; padding: 20px; text-align: center; }
-        .box { background: #fff; padding: 30px; border-radius: 15px; max-width: 600px; margin: auto; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .btn-main { background: #2D1B13; color: #C5A059; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; margin: 10px; }
-        .update-box { margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
-        input, select { width: 80%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; padding: 20px; direction: rtl; }
+        .box { background: #fff; padding: 25px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2D1B13; }
+        input, select, label { width: 100%; display: block; margin-top: 10px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #2D1B13; color: #C5A059; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h2>لوحة تحكم م/ إبراهيم سعد</h2>
-    <p>استخدم هذا الزر لرفع المنيو الأساسية لأول مرة فقط:</p>
-    <button class="btn-main" onclick="uploadFullMenu()">🚀 رفع كل الأصناف الأساسية الآن</button>
-
-    <div class="update-box">
-        <h3>تعديل سعر صنف أو إضافة جديد</h3>
-        <select id="up-cat">
-            <option value="coffee">بن مطحون</option>
-            <option value="flavors">بن نكهات</option>
-            <option value="nescafe">نسكافيه</option>
-        </select>
-        <input type="text" id="up-name" placeholder="اسم الصنف">
-        <input type="number" id="up-price" placeholder="السعر الجديد">
-        <button class="btn-main" style="background:#C5A059; color:#2D1B13;" onclick="saveSingle()">تحديث السعر</button>
-    </div>
+    <h2>إدارة حبه بن ☕</h2>
+    <label>القسم:</label>
+    <select id="p-cat">
+        <option value="coffee">بن مطحون</option>
+        <option value="flavors">بن نكهات</option>
+        <option value="nescafe">نسكافيه</option>
+    </select>
+    
+    <label>اسم الصنف:</label>
+    <input type="text" id="p-name" placeholder="مثلاً: بن فاتح">
+    
+    <label>السعر الحالي:</label>
+    <input type="number" id="p-price" placeholder="السعر الذي سيتم البيع به">
+    
+    <label>السعر قبل الخصم (اختياري):</label>
+    <input type="number" id="p-old" placeholder="سيبه فاضي لو مفيش خصم">
+    
+    <label>الحالة في المخزن:</label>
+    <select id="p-status">
+        <option value="available">متوفر (Available)</option>
+        <option value="out">خلصان (Out of Stock)</option>
+    </select>
+    
+    <button class="btn" onclick="save()">تحديث / إضافة الصنف</button>
 </div>
 
 <script>
@@ -46,40 +56,24 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const initialMenu = [
-        {name: "بن اسبيشيال فاتح", price: 140, category: "coffee"},
-        {name: "بن صحصحة وسط", price: 170, category: "coffee"},
-        {name: "بن الروقان وسط", price: 150, category: "coffee"},
-        {name: "بن الكيف وسط", price: 150, category: "coffee"},
-        {name: "بن مزاج فاتح", price: 140, category: "coffee"},
-        {name: "بن غامق", price: 140, category: "coffee"},
-        {name: "اسبريسو", price: 170, category: "coffee"},
-        {name: "حبه بن فرنساوي", price: 110, category: "flavors"},
-        {name: "حبه بن بندق", price: 110, category: "flavors"},
-        {name: "حبه بن بندق قطع", price: 130, category: "flavors"},
-        {name: "حبه بن شوكولاتة", price: 110, category: "flavors"},
-        {name: "نسكافيه بلاك", price: 250, category: "nescafe"},
-        {name: "نسكافيه جولد", price: 300, category: "nescafe"},
-        {name: "نسكافيه 3*1", price: 100, category: "nescafe"},
-        {name: "نسكافيه 3*1 روقان", price: 120, category: "nescafe"}
-    ];
+    function save() {
+        const name = document.getElementById('p-name').value;
+        const price = document.getElementById('p-price').value;
+        const oldPrice = document.getElementById('p-old').value;
+        const status = document.getElementById('p-status').value;
+        const cat = document.getElementById('p-cat').value;
 
-    async function uploadFullMenu() {
-        if(!confirm("هل تريد رفع 15 صنفاً لقاعدة البيانات الآن؟")) return;
-        for(let item of initialMenu) {
-            await db.collection("products").doc(item.name).set(item);
-        }
-        alert("تم رفع المنيو كاملة بنجاح! افتح صفحة المنتجات الآن.");
-    }
+        if(!name || !price) return alert("املا البيانات يا هندسة");
 
-    function saveSingle() {
-        const name = document.getElementById('up-name').value;
-        const price = document.getElementById('up-price').value;
-        const cat = document.getElementById('up-cat').value;
-        if(!name || !price) return alert("املا البيانات");
         db.collection("products").doc(name).set({
-            name: name, price: parseInt(price), category: cat
-        }).then(() => alert("تم التحديث!"));
+            name, price: parseInt(price), oldPrice: oldPrice ? parseInt(oldPrice) : null,
+            status, category: cat
+        }).then(() => {
+            alert("تم التحديث بنجاح!");
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-price').value = '';
+            document.getElementById('p-old').value = '';
+        });
     }
 </script>
 </body>
