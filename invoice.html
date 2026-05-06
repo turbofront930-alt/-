@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>فاتورة حبه بن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #f9f9f9; padding: 20px; }
+        .invoice-box { background: #fff; padding: 30px; border-radius: 10px; max-width: 500px; margin: auto; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        .header { text-align: center; border-bottom: 2px solid #2D1B13; padding-bottom: 10px; margin-bottom: 20px; }
+        .logo { height: 80px; }
+        .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px inset #eee; }
+        .total { font-size: 1.5rem; font-weight: bold; text-align: left; color: #2D1B13; margin-top: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 0.9rem; color: #888; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+
+<div class="invoice-box" id="invoice">
+    <div class="header">
+        <img src="logo.png" class="logo">
+        <h2>فاتورة طلب شراء</h2>
+        <p id="order-date"></p>
+    </div>
+
+    <div id="items-list">
+        </div>
+
+    <div class="total">الإجمالي: <span id="order-total"></span> ج.م</div>
+
+    <div class="footer">
+        <p>شكراً لثقتكم في حبه بن ☕</p>
+        <p>01016688355</p>
+        <button class="no-print" onclick="window.print()" style="padding: 10px 20px; background: #C5A059; border: none; border-radius: 5px; cursor: pointer;">طباعة أو حفظ PDF</button>
+    </div>
+</div>
+
+<script>
+    const orderData = JSON.parse(localStorage.getItem('lastOrder'));
+    if (orderData) {
+        document.getElementById('order-date').innerText = orderData.date;
+        document.getElementById('order-total').innerText = orderData.total;
+        
+        const list = document.getElementById('items-list');
+        orderData.items.forEach(item => {
+            list.innerHTML += `<div class="item-row"><span>${item.name}</span><span>${item.price} ج.م</span></div>`;
+        });
+    } else {
+        document.body.innerHTML = "<h2>لا توجد بيانات فاتورة حالياً</h2>";
+    }
+</script>
+</body>
+</html>
