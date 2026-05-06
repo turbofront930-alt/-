@@ -3,23 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر حبه بن | المتجر الذكي</title>
+    <title>متجر حبه بن | القائمة المحدثة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
         :root { --primary: #2D1B13; --accent: #C5A059; }
         body { font-family: 'Cairo', sans-serif; background-image: url('1000216005.jpg'); background-size: cover; background-attachment: fixed; margin: 0; color: #fff; }
-        .main-wrapper { background: rgba(0,0,0,0.7); min-height: 100vh; padding-bottom: 50px; }
+        .main-wrapper { background: rgba(0,0,0,0.75); min-height: 100vh; padding-bottom: 80px; }
         nav { background: var(--primary); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--accent); }
         .logo { height: clamp(70px, 15vw, 120px); }
-        .tabs-container { background: rgba(45, 27, 19, 0.9); padding: 10px; display: flex; overflow-x: auto; position: sticky; top: 100px; z-index: 999; border-bottom: 1px solid var(--accent); }
-        .tab-btn { padding: 8px 15px; color: #fff; border: 1px solid var(--accent); background: none; margin: 0 5px; cursor: pointer; border-radius: 5px; white-space: nowrap; }
-        .tab-btn.active { background: var(--accent); color: var(--primary); font-weight: bold; }
+        .tabs-container { background: rgba(45, 27, 19, 0.95); padding: 12px; display: flex; overflow-x: auto; position: sticky; top: clamp(90px, 20vw, 140px); z-index: 999; border-bottom: 1px solid var(--accent); gap: 10px; }
+        .tab-btn { padding: 8px 18px; color: #fff; border: 1px solid var(--accent); background: none; cursor: pointer; border-radius: 5px; white-space: nowrap; font-weight: bold; }
+        .tab-btn.active { background: var(--accent); color: var(--primary); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 12px; border: 1px solid rgba(197,160,89,0.2); text-align: center; }
-        .add-btn { width: 100%; background: var(--accent); color: var(--primary); border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .loading-msg { text-align: center; grid-column: 1/-1; padding: 50px; font-size: 1.2rem; }
+        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; border: 1px solid rgba(197,160,89,0.2); text-align: center; position: relative; transition: 0.3s; }
+        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .badge-offer { background: #e74c3c; color: white; padding: 3px 10px; border-radius: 5px; position: absolute; top: 10px; right: 10px; font-size: 12px; font-weight: bold; }
+        .price-old { text-decoration: line-through; color: #aaa; font-size: 0.9rem; margin-left: 8px; }
+        .price-now { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+        .add-btn { width: 100%; background: var(--accent); color: var(--primary); border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; }
+        .add-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
+        
+        /* سلة الطلبات تحت */
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); color: var(--primary); padding: 15px; text-align: center; font-weight: bold; cursor: pointer; z-index: 1001; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -27,7 +34,7 @@
 <div class="main-wrapper">
     <nav>
         <img src="logo.png" class="logo">
-        <div style="color:var(--accent); font-size:1.5rem; cursor:pointer;" onclick="toggleCart()">🛒 <span id="cart-count">0</span></div>
+        <div style="font-size: 1.5rem;">☕</div>
     </nav>
 
     <div class="tabs-container">
@@ -37,8 +44,12 @@
     </div>
 
     <div id="products-grid" class="grid">
-        <div class="loading-msg">جاري جلب الأسعار المحدثة من السيرفر...</div>
+        <p style="text-align:center; grid-column:1/-1;">جاري تحديث الأسعار...</p>
     </div>
+</div>
+
+<div class="cart-bar" onclick="sendOrder()">
+    إتمام الطلب وفتح الفاتورة (<span id="cart-count">0</span> أصناف)
 </div>
 
 <script>
@@ -53,6 +64,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    let cart = [];
     let currentCat = 'coffee';
 
     function loadProducts() {
@@ -62,15 +74,43 @@
             grid.innerHTML = '';
             querySnapshot.forEach((doc) => {
                 const item = doc.data();
+                const isOut = item.status === 'out';
+                const hasOffer = item.oldPrice && item.oldPrice > item.price;
+
                 grid.innerHTML += `
-                    <div class="card">
-                        <h3 style="color:var(--accent);">${item.name}</h3>
-                        <p>السعر الحالي: ${item.price} ج.م</p>
-                        <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">إضافة للسلة</button>
+                    <div class="card" style="${isOut ? 'opacity:0.6; filter:grayscale(0.8);' : ''}">
+                        ${hasOffer ? '<span class="badge-offer">عرض خاص!</span>' : ''}
+                        <h3>${item.name}</h3>
+                        <p>
+                            ${hasOffer ? `<span class="price-old">${item.oldPrice} ج.م</span>` : ''}
+                            <span class="price-now">${item.price} ج.م</span>
+                        </p>
+                        <button class="add-btn" ${isOut ? 'disabled' : ''} onclick="addToCart('${item.name}', ${item.price})">
+                            ${isOut ? 'نفذت الكمية' : 'إضافة للسلة'}
+                        </button>
                     </div>
                 `;
             });
         });
+    }
+
+    function addToCart(name, price) {
+        cart.push({ name, price });
+        document.getElementById('cart-count').innerText = cart.length;
+    }
+
+    function sendOrder() {
+        if(cart.length === 0) return alert("السلة فارغة!");
+        
+        let total = cart.reduce((sum, item) => sum + item.price, 0);
+        let msg = "طلب جديد من حبه بن%0A-----------------%0A";
+        cart.forEach(i => msg += `• ${i.name} (${i.price} ج.م)%0A`);
+        msg += `-----------------%0Aالإجمالي: ${total} ج.م`;
+
+        localStorage.setItem('lastOrder', JSON.stringify({ items: cart, total, date: new Date().toLocaleString() }));
+        
+        window.open('invoice.html', '_blank');
+        window.location.href = `https://wa.me/201016688355?text=${msg}`;
     }
 
     function changeTab(cat, btn) {
@@ -81,6 +121,5 @@
     }
     loadProducts();
 </script>
-<script src="script.js"></script>
 </body>
 </html>
