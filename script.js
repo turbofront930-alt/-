@@ -1,65 +1,75 @@
-// ملف المحرك الأساسي للمتجر - م/ إبراهيم سعد
+/**
+ * المحرك الأساسي لمتجر حبه بن - النسخة المحدثة ☕
+ * م/ إبراهيم سعد - 2026
+ */
+
 let cart = [];
 
-// 1. دالة إضافة المنتجات للسلة
-function addToCart(name, price) {
-    cart.push({ name, price });
-    updateCartCount();
+// 1. إضافة المنتجات للسلة (بما في ذلك الوزن)
+function addToCart(fullName, price) {
+    cart.push({ name: fullName, price: price });
+    updateCartDisplay();
     
-    // تنبيه شيك للاضافة
-    console.log(`تمت إضافة ${name} بمبلغ ${price} ج.م`);
+    // تأثير بصري بسيط (Log) للتأكد من الإضافة
+    console.log(`✅ تمت إضافة: ${fullName} - السعر: ${price} ج.م`);
 }
 
-// 2. تحديث عداد السلة في الصفحة
-function updateCartCount() {
-    const countElement = document.getElementById('cart-count');
-    if (countElement) {
-        countElement.innerText = cart.length;
+// 2. تحديث عداد السلة في البار السفلي
+function updateCartDisplay() {
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+        cartCountElement.innerText = cart.length;
     }
 }
 
-// 3. دالة إرسال الطلب (واتساب + فاتورة)
+// 3. دالة إرسال الطلب (واتساب + تجهيز الفاتورة)
 function sendOrder() {
     if (cart.length === 0) {
-        alert("يا هندسة السلة فاضية، اختار الأصناف الأول!");
+        alert("يا هندسة السلة لسه فاضية، اختار الأصناف اللي تحبها الأول! 😊");
         return;
     }
 
-    // حساب الإجمالي
+    // حساب الإجمالي الكلي
     let total = cart.reduce((sum, item) => sum + item.price, 0);
 
-    // تجهيز رسالة الواتساب
-    let phone = "201016688355"; // رقم صاحب المحل
-    let message = "طلب جديد من حبه بن ☕%0A";
-    message += "--------------------------%0A";
+    // تجهيز رسالة الواتساب بشكل احترافي
+    const phoneNumber = "201016688355"; // رقم صاحب المحل
+    let whatsappMsg = "طلب جديد من متجر حبه بن ☕%0A";
+    whatsappMsg += "--------------------------%0A";
     
     cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} (${item.price} ج.م)%0A`;
+        whatsappMsg += `${index + 1}. ${item.name} ⬅️ ${item.price} ج.م%0A`;
     });
 
-    message += "--------------------------%0A";
-    message += `الإجمالي الكلي: ${total} ج.م`;
+    whatsappMsg += "--------------------------%0A";
+    whatsappMsg += `💰 الإجمالي الكلي: ${total} ج.م%0A`;
+    whatsappMsg += "شكراً لثقتكم في حبه بن! 🙏";
 
-    // حفظ البيانات محلياً عشان الفاتورة تقرأها
-    const orderData = {
+    // 4. حفظ بيانات الطلب في المتصفح عشان صفحة الفاتورة (invoice.html) تقرأها
+    const orderDetails = {
         items: cart,
         total: total,
-        date: new Date().toLocaleString('ar-EG')
+        orderDate: new Date().toLocaleString('ar-EG'),
+        shopName: "حبه بن"
     };
-    localStorage.setItem('lastOrder', JSON.stringify(orderData));
+    
+    localStorage.setItem('lastOrder', JSON.stringify(orderDetails));
 
-    // فتح الفاتورة في صفحة جديدة
+    // 5. التوجه للفاتورة وللواتساب
+    // نفتح الفاتورة في تبويب جديد للطباعة
     window.open('invoice.html', '_blank');
 
-    // التحويل للواتساب
-    window.location.href = `https://wa.me/${phone}?text=${message}`;
+    // نفتح الواتساب في نفس الصفحة للتحويل للدردشة
+    setTimeout(() => {
+        window.location.href = `https://wa.me/${phoneNumber}?text=${whatsappMsg}`;
+    }, 500); // تأخير بسيط لضمان حفظ البيانات
 }
 
-// 4. ميزة إضافية: مسح السلة بعد العودة
+// ميزة إضافية: تنظيف السلة لو العميل رجع للموقع (اختياري)
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
-        // لو العميل رجع للموقع تاني ممكن نصفر السلة لو حبيت
+        // لو حبيت تمسح السلة لما يرجع، فك الكومنت عن السطرين الجايين
         // cart = [];
-        // updateCartCount();
+        // updateCartDisplay();
     }
 });
