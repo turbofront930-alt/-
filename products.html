@@ -3,54 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر حبه بن | قائمة الأصناف</title>
+    <title>متجر حبه بن | الأصناف</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2D1B13; --accent: #C5A059; --bg: #F9F5F0; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
-
-        /* الهيدر */
-        nav { background: var(--primary); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--accent); }
-        .logo { height: 50px; }
-        .cart-icon { color: var(--accent); font-size: 1.5rem; cursor: pointer; position: relative; }
-        .cart-count { position: absolute; top: -10px; right: -10px; background: #e74c3c; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; }
-
-        /* نظام الصفحات (Tabs) */
-        .tabs-container { background: #fff; padding: 15px; display: flex; justify-content: center; gap: 10px; position: sticky; top: 83px; z-index: 999; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .tab-btn { padding: 10px 25px; border: 2px solid var(--primary); background: none; color: var(--primary); font-weight: bold; border-radius: 50px; cursor: pointer; transition: 0.3s; }
-        .tab-btn.active { background: var(--primary); color: var(--accent); border-color: var(--primary); }
-
-        /* الأنيميشن (Roll/Fade) */
-        .page-content { display: none; padding: 20px; max-width: 1100px; margin: auto; animation: slideUp 0.6s ease; }
-        .page-content.active { display: block; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
+        :root { --primary: #2D1B13; --accent: #C5A059; --bg-overlay: rgba(0, 0, 0, 0.7); }
+        
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-image: url('1000216005.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            margin: 0; padding: 0;
         }
 
-        /* كروت المنتجات */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-top: 5px solid var(--accent); transition: 0.3s; }
-        .card:hover { transform: scale(1.02); }
-        .weight-select { display: flex; gap: 5px; margin: 15px 0; }
-        .weight-btn { flex: 1; padding: 7px; border: 1px solid #ddd; border-radius: 5px; background: #fff; cursor: pointer; font-size: 0.8rem; }
-        .weight-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .qty-row { display: flex; align-items: center; gap: 10px; }
-        .add-btn { flex: 1; background: var(--primary); color: var(--accent); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .main-wrapper { background: var(--bg-overlay); min-height: 100vh; width: 100%; }
 
-        /* السلة الجانبية */
-        .cart-sidebar { position: fixed; left: -400px; top: 0; width: 350px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.2); }
-        .cart-sidebar.open { left: 0; }
+        /* هيدر منظم */
+        nav { 
+            background: var(--primary); 
+            padding: 10px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--accent);
+        }
+
+        .logo { 
+            height: clamp(80px, 15vw, 180px); /* حجم مرن: يصغر في الموبايل ويكبر في الشاشة */
+            width: auto; transition: 0.3s;
+        }
+
+        .cart-icon { color: var(--accent); font-size: 1.5rem; cursor: pointer; position: relative; }
+        .cart-count { position: absolute; top: -10px; right: -12px; background: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; }
+
+        /* أزرار الأقسام (تتحرك باللمس في الموبايل) */
+        .tabs-container { 
+            background: rgba(45, 27, 19, 0.9); padding: 10px; 
+            display: flex; justify-content: center; gap: 8px; 
+            position: sticky; top: clamp(100px, 20vw, 200px); z-index: 999;
+            overflow-x: auto; white-space: nowrap; /* ميزة السحب للموبايل */
+        }
+        .tab-btn { 
+            padding: 8px 15px; border: 1px solid var(--accent); background: none; 
+            color: #fff; border-radius: 5px; cursor: pointer; font-size: 0.9rem;
+        }
+        .tab-btn.active { background: var(--accent); color: var(--primary); font-weight: bold; }
+
+        /* المحتوى والأنيميشن */
+        .page-content { display: none; padding: 20px; max-width: 1200px; margin: auto; animation: rollUp 0.5s ease; }
+        .page-content.active { display: block; }
+        @keyframes rollUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* شبكة الكروت (Responsive Grid) */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* كارت واحد في الموبايل وتلقائي في الكمبيوتر */
+            gap: 20px; 
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); 
+            padding: 20px; border-radius: 12px; border: 1px solid rgba(197, 160, 89, 0.2);
+            text-align: center; color: #fff;
+        }
+        .card h3 { color: var(--accent); margin: 0 0 10px; font-size: 1.2rem; }
         
-        footer { background: var(--primary); color: #fff; padding: 100px; text-align: center; margin-top: 200px; }
+        .weight-select { display: flex; gap: 4px; margin-bottom: 15px; }
+        .weight-btn { flex: 1; padding: 6px; border: 1px solid var(--accent); background: none; color: #fff; cursor: pointer; border-radius: 4px; font-size: 0.8rem; }
+        .weight-btn.active { background: var(--accent); color: var(--primary); }
+        
+        .add-btn { width: 100%; background: var(--accent); color: var(--primary); border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* سلة المشتريات (تأخذ مساحة أكبر في الموبايل) */
+        .cart-sidebar { 
+            position: fixed; left: -100%; top: 0; width: 85%; max-width: 350px; 
+            height: 100%; background: #fff; color: #333; z-index: 2000; transition: 0.4s; padding: 20px;
+        }
+        .cart-sidebar.open { left: 0; }
+
+        footer { background: var(--primary); padding: 30px; text-align: center; border-top: 3px solid var(--accent); color: #fff; }
+
+        /* تعديلات خاصة للموبايل الصغير جداً */
+        @media (max-width: 480px) {
+            nav { padding: 10px; }
+            .tabs-container { justify-content: flex-start; padding-left: 10px; }
+            .card { padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
+<div class="main-wrapper">
     <nav>
-        <img src="logo.png" class="logo">
+        <img src="logo.png" class="logo" alt="حبه بن">
         <div class="cart-icon" onclick="toggleCart()">
             <i class="fas fa-shopping-basket"></i>
             <span class="cart-count" id="cart-count">0</span>
@@ -63,93 +107,81 @@
         <button class="tab-btn" onclick="showPage('nescafe', this)">نسكافيه</button>
     </div>
 
-    <div id="coffee" class="page-content active">
-        <div class="grid" id="coffee-grid"></div>
+    <div id="coffee" class="page-content active"><div class="grid" id="coffee-grid"></div></div>
+    <div id="flavors" class="page-content"><div class="grid" id="flavors-grid"></div></div>
+    <div id="nescafe" class="page-content"><div class="grid" id="nescafe-grid"></div></div>
+</div>
+
+<div class="cart-sidebar" id="cart-sidebar">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0;">سلة المشتريات</h3>
+        <i class="fas fa-times" onclick="toggleCart()" style="cursor:pointer; font-size:1.2rem;"></i>
     </div>
-
-    <div id="flavors" class="page-content">
-        <div class="grid" id="flavors-grid"></div>
+    <div id="cart-items-container" style="margin-top:20px;"></div>
+    <hr>
+    <div style="display:flex; justify-content:space-between; font-weight:bold;">
+        <span>الإجمالي:</span>
+        <span><span id="cart-total">0</span> ج.م</span>
     </div>
+    <button class="add-btn" style="background:#25D366; color:#fff; margin-top:15px;" onclick="sendOrder()">إرسال واتساب</button>
+</div>
 
-    <div id="nescafe" class="page-content">
-        <div class="grid" id="nescafe-grid"></div>
-    </div>
+<footer>
+    <p>تصميم المهندس / إبراهيم سعد</p>
+</footer>
 
-    <div class="cart-sidebar" id="cart-sidebar">
-        <h2>سلة المشتريات</h2>
-        <div id="cart-items-container"></div>
-        <hr>
-        <button class="add-btn" style="width: 100%; background: #25D366; color: #fff;" onclick="sendOrder()">إرسال الطلب واتساب</button>
-        <button onclick="toggleCart()" style="margin-top:10px; width:100%; padding:10px; border:none; border-radius:8px;">إغلاق</button>
-    </div>
+<script>
+    // نفس الداتا السابقة (menuData) ونفس دالة الـ render والـ showPage
+    const menuData = {
+        coffee: [
+            { name: "بن اسبيشيال فاتح", price: 140 }, { name: "بن صحصحة وسط", price: 170 },
+            { name: "بن الروقان وسط", price: 150 }, { name: "بن الكيف وسط", price: 150 },
+            { name: "بن مزاج فاتح", price: 140 }, { name: "بن غامق", price: 140 }, { name: "اسبريسو", price: 170 }
+        ],
+        flavors: [
+            { name: "حبه بن فرنساوي", price: 110 }, { name: "حبه بن بندق", price: 110 },
+            { name: "حبه بن بندق قطع", price: 130 }, { name: "حبه بن شوكولاتة", price: 110 }
+        ],
+        nescafe: [
+            { name: "نسكافيه بلاك", price: 250 }, { name: "نسكافيه جولد", price: 300 },
+            { name: "نسكافيه 3*1", price: 100 }, { name: "نسكافيه 3*1 روقان", price: 120 }
+        ]
+    };
 
-    <footer>
-        <p>تم التصميم بواسطة <b>المهندس / إبراهيم سعد</b></p>
-        <p>للدعم الفني: 01101475409</p>
-    </footer>
+    function showPage(id, btn) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
 
-    <script>
-        const data = {
-            coffee: [
-                { name: "بن اسبيشيال فاتح", price: 140 },
-                { name: "بن صحصحة وسط", price: 170 },
-                { name: "بن الروقان وسط", price: 150 },
-                { name: "بن الكيف وسط", price: 150 },
-                { name: "بن مزاج فاتح", price: 140 },
-                { name: "بن غامق", price: 140 },
-                { name: "اسبريسو", price: 170 }
-            ],
-            flavors: [
-                { name: "حبه بن فرنساوي", price: 110 },
-                { name: "حبه بن بندق", price: 110 },
-                { name: "حبه بن بندق قطع", price: 130 },
-                { name: "حبه بن شوكولاتة", price: 110 }
-            ],
-            nescafe: [
-                { name: "نسكافيه بلاك", price: 250 },
-                { name: "نسكافيه جولد", price: 300 },
-                { name: "نسكافيه 3*1", price: 100 },
-                { name: "نسكافيه 3*1 روقان", price: 120 }
-            ]
-        };
-
-        function showPage(pageId, btn) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            btn.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function renderAll() {
-            Object.keys(data).forEach(key => {
-                const grid = document.getElementById(`${key}-grid`);
-                data[key].forEach(item => {
-                    grid.innerHTML += `
-                        <div class="card" data-name="${item.name}" data-price="${item.price}">
-                            <h3>${item.name}</h3>
-                            <p>سعر الربع: ${item.price} ج.م</p>
-                            <div class="weight-select">
-                                <button class="weight-btn active" onclick="setW(this, 1)">ربع</button>
-                                <button class="weight-btn" onclick="setW(this, 2)">نص</button>
-                                <button class="weight-btn" onclick="setW(this, 4)">كيلو</button>
-                            </div>
-                            <div class="qty-row">
-                                <button onclick="addToCart(this)" class="add-btn">إضافة للسلة</button>
-                            </div>
+    function render() {
+        Object.keys(menuData).forEach(key => {
+            const grid = document.getElementById(`${key}-grid`);
+            menuData[key].forEach(item => {
+                grid.innerHTML += `
+                    <div class="card" data-name="${item.name}" data-price="${item.price}">
+                        <h3>${item.name}</h3>
+                        <p style="font-size:0.9rem;">السعر (ربع كيلو): ${item.price} ج.م</p>
+                        <div class="weight-select">
+                            <button class="weight-btn active" onclick="setW(this, 1)">ربع</button>
+                            <button class="weight-btn" onclick="setW(this, 2)">نص</button>
+                            <button class="weight-btn" onclick="setW(this, 4)">كيلو</button>
                         </div>
-                    `;
-                });
+                        <button onclick="addToCart(this)" class="add-btn">إضافة</button>
+                    </div>
+                `;
             });
-        }
+        });
+    }
 
-        function setW(btn, m) {
-            btn.parentElement.querySelectorAll('.weight-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+    function setW(btn, m) {
+        btn.parentElement.querySelectorAll('.weight-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
 
-        renderAll();
-    </script>
-    <script src="script.js"></script>
+    render();
+</script>
+<script src="script.js"></script>
 </body>
 </html>
