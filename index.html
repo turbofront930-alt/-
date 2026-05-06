@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حبه بن | الرئيسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2D1B13; --accent: #C5A059; --bg: #F9F5F0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; }
+        nav { background: var(--primary); padding: 10px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--accent); }
+        .logo { height: 70px; }
+        .nav-links a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
+        .social-nav a { color: var(--accent); margin-right: 15px; font-size: 1.2rem; }
+        .hero { height: 80vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1500'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: white; text-align: center; }
+        .btn-main { background: var(--accent); color: var(--primary); padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; margin-top: 20px; }
+        footer { background: #1a120b; color: #fff; padding: 40px; text-align: center; border-top: 4px solid var(--accent); }
+        .dev-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <nav>
+        <img src="logo.png" alt="لوجو حبه بن" class="logo">
+        <div class="nav-links">
+            <a href="index.html">الرئيسية</a>
+            <a href="products.html">المتجر</a>
+            <a href="about.html">تواصل معنا</a>
+        </div>
+        <div class="social-nav">
+            <a href="https://www.facebook.com/profile.php?id=61588819432975" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://wa.me/201016688355" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    </nav>
+    <section class="hero">
+        <div>
+            <h1 style="font-family:'Amiri'; font-size: 4rem; color: var(--accent);">حبه بن</h1>
+            <p style="font-size: 1.5rem;">المزاج يبدأ من هنا..</p>
+            <a href="products.html" class="btn-main">اطلب الآن عبر الواتساب</a>
+        </div>
+    </section>
+    <footer>
+        <div style="margin-bottom: 20px;">
+            <a href="https://www.facebook.com/profile.php?id=61588819432975" target="_blank" style="color:white; margin:0 10px; font-size:1.5rem;"><i class="fab fa-facebook"></i></a>
+            <a href="https://wa.me/201016688355" target="_blank" style="color:white; margin:0 10px; font-size:1.5rem;"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <div class="dev-section">
+            <span style="color: var(--accent); font-size: 1.2rem;"><i class="fas fa-terminal"></i> تصميم المهندس / إبراهيم سعد</span>
+            <p>تواصل مع المصمم: <a href="https://wa.me/201101475409" style="color: var(--accent); text-decoration: none;">01101475409</a></p>
+        </div>
+    </footer>
+</body>
+</html>
