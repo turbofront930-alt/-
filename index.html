@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حبه بن | الرئيسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2D1B13; --accent: #C5A059; --bg: #F9F5F0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; }
+        nav { background: var(--primary); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; transition: 0.3s; }
+        nav a:hover { color: var(--accent); }
+        .logo { font-family: 'Amiri', serif; color: var(--accent); font-size: 2rem; }
+        .hero { height: 80vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1500'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: white; text-align: center; }
+        .hero h1 { font-size: 4rem; font-family: 'Amiri', serif; margin-bottom: 10px; color: var(--accent); }
+        .btn-main { background: var(--accent); color: var(--primary); padding: 15px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.2rem; transition: 0.3s; display: inline-block; margin-top: 25px; }
+        .btn-main:hover { transform: scale(1.05); background: white; }
+        footer { background: #1a120b; color: #888; padding: 30px; text-align: center; border-top: 2px solid var(--accent); }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">حبه بن</div>
+        <div>
+            <a href="index.html">الرئيسية</a>
+            <a href="products.html">المتجر</a>
+            <a href="about.html">تواصل معنا</a>
+        </div>
+    </nav>
+    <section class="hero">
+        <div>
+            <h1>حبه بن</h1>
+            <p style="font-size: 1.5rem;">المزاج يبدأ من هنا..</p>
+            <a href="products.html" class="btn-main">اكتشف قائمتنا</a>
+        </div>
+    </section>
+    <footer><p>تصميم م/ إبراهيم © 2026 | حبه بن</p></footer>
+</body>
+</html>
