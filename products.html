@@ -3,219 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر حبه بن | القائمة المحدثة</title>
+    <title>متجر حبه بن</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
     <style>
-        :root {
-            --primary: #3d2b1f;
-            --secondary: #2a1d15;
-            --accent: #d35400; /* لون الوزن */
-            --gold: #f39c12;
-            --white: #ecf0f1;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary);
-            background-image: url('back.jpg'); /* اسم صورة الخلفية */
-            background-size: cover;
-            background-attachment: fixed;
-            color: var(--white);
-            margin: 0;
-            padding-bottom: 80px;
-        }
-        .header {
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid var(--gold);
-        }
-        .logo { width: 120px; }
-        .tabs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--primary);
-        }
-        .tab-btn {
-            background: none;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .tab-btn.active {
-            background: var(--gold);
-            color: var(--primary);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            position: relative;
-            transition: 0.3s;
-        }
-        .card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .badge-offer {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #e74c3c;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-        }
-        .price-now { font-size: 1.5rem; color: var(--gold); font-weight: bold; }
-        .price-old { text-decoration: line-through; color: #bdc3c7; margin-left: 10px; font-size: 0.9rem; }
-        .weight-tag { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin: 10px 0; }
-        .add-btn {
-            background: var(--gold);
-            border: none;
-            color: var(--primary);
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        .cart-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: var(--gold);
-            color: var(--primary);
-            text-align: center;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-            z-index: 1000;
-        }
+        :root { --p: #3d2b1f; --g: #f39c12; --w: #ecf0f1; --a: #d35400; }
+        body { font-family: 'Segoe UI', Tahoma; background: var(--p) url('back.jpg') fixed center; background-size: cover; color: var(--w); margin: 0; padding-bottom: 80px; }
+        .header { background: rgba(0,0,0,0.6); padding: 20px; text-align: center; border-bottom: 2px solid var(--g); }
+        .tabs { display: flex; justify-content: center; gap: 10px; padding: 15px; position: sticky; top: 0; background: var(--p); z-index: 100; }
+        .tab-btn { background: none; border: 2px solid var(--g); color: var(--g); padding: 8px 15px; border-radius: 20px; cursor: pointer; }
+        .tab-btn.active { background: var(--g); color: var(--p); font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); border-radius: 15px; padding: 20px; text-align: center; border: 1px solid var(--g); }
+        .price { font-size: 1.5rem; color: var(--g); font-weight: bold; }
+        .old-price { text-decoration: line-through; color: #aaa; font-size: 0.9rem; margin-left: 10px; }
+        .weight { color: var(--a); font-weight: bold; margin: 10px 0; }
+        .add-btn { background: var(--g); border: none; color: var(--p); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .cart-bar { position: fixed; bottom: 0; width: 100%; background: var(--g); color: var(--p); text-align: center; padding: 15px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <img src="logo.png" alt="لوجو حبه بن" class="logo">
-    </div>
-
+    <div class="header"><img src="logo.png" width="100"></div>
     <div class="tabs">
         <button class="tab-btn active" onclick="changeTab('coffee', this)">بن مطحون</button>
         <button class="tab-btn" onclick="changeTab('flavors', this)">بن نكهات</button>
         <button class="tab-btn" onclick="changeTab('nescafe', this)">نسكافيه</button>
     </div>
-
-    <div id="products-grid" class="grid">
-        <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنيو الفريش...</p>
-    </div>
-
-    <div class="cart-bar" onclick="sendOrder()">
-        إتمام الطلب وفتح الفاتورة (<span id="cart-count">0</span> أصناف)
-    </div>
+    <div id="grid" class="grid"></div>
+    <div class="cart-bar" onclick="sendOrder()">إتمام الطلب (<span id="cart-count">0</span>)</div>
 
 <script>
-    // 1. Firebase Configuration (بيانات مشروعك)
     const firebaseConfig = {
         apiKey: "AIzaSyDHuRCchoNyx7Zx4T0OB_ayi_m2X83018E",
         authDomain: "habbat-bun-store.firebaseapp.com",
         projectId: "habbat-bun-store",
         storageBucket: "habbat-bun-store.firebasestorage.app",
         messagingSenderId: "685516631891",
-        appId: "1:685516631891:web:947262df61561c2dabfba6",
-        measurementId: "G-Q788DHR4TT"
+        appId: "1:685516631891:web:947262df61561c2dabfba6"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    let cart = [];
     let currentCat = 'coffee';
 
-    // 2. دالة تحميل المنتجات
     function loadProducts() {
-        const grid = document.getElementById('products-grid');
+        const grid = document.getElementById('grid');
+        // تحويل الفئة للعربي عشان يطابق الفايربيز عندك
+        const catMap = { 'coffee': 'قهوة', 'flavors': 'نكهات', 'nescafe': 'نسكافيه' };
         
-        db.collection("products").where("category", "==", currentCat)
-        .onSnapshot((querySnapshot) => {
+        db.collection("منتجات").where("فئة", "==", catMap[currentCat]).onSnapshot((qs) => {
             grid.innerHTML = '';
-            if (querySnapshot.empty) {
-                grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">لا توجد أصناف في هذا القسم حالياً</p>';
-            }
-            
-            querySnapshot.forEach((doc) => {
-                const item = doc.data();
-                const isOut = item.status === 'out';
-                const hasOffer = item.oldPrice && item.oldPrice > item.price;
-                const weight = item.weight || 'ربع كيلو'; // القيمة الافتراضية
-
+            qs.forEach((doc) => {
+                const i = doc.data();
+                const weight = i["الوزن"] || 'ربع كيلو';
                 grid.innerHTML += `
-                    <div class="card" style="${isOut ? 'opacity:0.6; filter:grayscale(0.8);' : ''}">
-                        ${hasOffer ? '<span class="badge-offer">عرض خاص!</span>' : ''}
-                        <h3 style="margin-bottom: 5px; color: var(--gold);">${item.name}</h3>
-                        
-                        <p class="weight-tag">الوزن: ${weight}</p>
-
+                    <div class="card">
+                        <h3>${i["اسم"]}</h3>
+                        <p class="weight">الوزن: ${weight}</p>
                         <p>
-                            ${hasOffer ? `<span class="price-old">${item.oldPrice} ج.م</span>` : ''}
-                            <span class="price-now">${item.price} ج.م</span>
+                            ${i["السعر القديم"] ? `<span class="old-price">${i["السعر القديم"]} ج.م</span>` : ''}
+                            <span class="price">${i["سعر"]} ج.م</span>
                         </p>
-                        <button class="add-btn" ${isOut ? 'disabled' : ''} 
-                                onclick="addToCart('${item.name} (${weight})', ${item.price})">
-                            ${isOut ? 'نفذت الكمية' : 'إضافة للسلة'}
-                        </button>
-                    </div>
-                `;
+                        <button class="add-btn" onclick="addToCart('${i["اسم"]} (${weight})', ${i["سعر"]})">إضافة للسلة</button>
+                    </div>`;
             });
         });
     }
-
-    // 3. التبديل بين الأقسام
-    function changeTab(cat, btn) {
-        currentCat = cat;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        loadProducts();
-    }
-
-    // 4. السلة والطلب
-    function addToCart(fullName, price) {
-        cart.push({ name: fullName, price });
-        document.getElementById('cart-count').innerText = cart.length;
-        console.log("تمت إضافة:", fullName);
-    }
-
-    function sendOrder() {
-        if (cart.length === 0) return alert("السلة فاضية يا هندسة!");
-        
-        let total = cart.reduce((s, i) => s + i.price, 0);
-        let msg = "طلب جديد من حبه بن ☕%0A----------------%0A";
-        cart.forEach((item, index) => {
-            msg += `${index + 1}. ${item.name} - ${item.price} ج.م%0A`;
-        });
-        msg += "----------------%0A";
-        msg += `الإجمالي: ${total} ج.م`;
-
-        // حفظ للفاتورة
-        localStorage.setItem('lastOrder', JSON.stringify({items: cart, total: total, date: new Date().toLocaleString('ar-EG')}));
-        
-        // فتح الواتساب والفاتورة
-        window.open('invoice.html', '_blank');
-        window.location.href = `https://wa.me/201016688355?text=${msg}`;
+    function changeTab(c, b) { currentCat = c; document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); loadProducts(); }
+    loadProducts();
+</script>
+<script src="script.js"></script>
+</body>
+</html>
