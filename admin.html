@@ -1,31 +1,113 @@
-<label>الوزن / الحجم:</label>
-<select id="p-weight">
-    <option value="ربع كيلو">ربع كيلو</option>
-    <option value="نص كيلو">نص كيلو</option>
-    <option value="كيلو كامل">كيلو كامل</option>
-</select>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم حبه بن</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: right; }
+        .container { max-width: 500px; background: white; padding: 20px; border-radius: 10px; margin: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #3d2b1f; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #3d2b1f; color: white; }
+        .btn-fast { background: #f39c12; color: white; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>☕ إدارة متجر حبه بن</h2>
+    
+    <label>القسم:</label>
+    <select id="p-cat">
+        <option value="coffee">بن مطحون</option>
+        <option value="flavors">بن نكهات</option>
+        <option value="nescafe">نسكافيه</option>
+    </select>
+
+    <label>اسم الصنف:</label>
+    <input type="text" id="p-name" placeholder="مثلاً: بن اسبيشيال فاتح">
+
+    <label>السعر الحالي (ج.م):</label>
+    <input type="number" id="p-price" placeholder="140">
+
+    <label>السعر قبل الخصم (اختياري):</label>
+    <input type="number" id="p-old" placeholder="160">
+
+    <label>الوزن:</label>
+    <select id="p-weight">
+        <option value="ربع كيلو">ربع كيلو</option>
+        <option value="نص كيلو">نص كيلو</option>
+        <option value="كيلو">كيلو</option>
+    </select>
+
+    <label>الحالة في المخزن:</label>
+    <select id="p-status">
+        <option value="available">متوفر</option>
+        <option value="out">نفذت الكمية</option>
+    </select>
+
+    <button class="btn-save" onclick="save()">💾 تحديث / إضافة الصنف</button>
+    <button class="btn-fast" onclick="fastUpload()">🚀 رفع المنيو الأساسية (ربع كيلو)</button>
+</div>
 
 <script>
-    // تعديل دالة save لتشمل الوزن
-    function save() {
+    // بيانات الربط الخاصة بك
+    const firebaseConfig = {
+        apiKey: "AIzaSyDHuRCchoNyx7Zx4T0OB_ayi_m2X83018E",
+        authDomain: "habbat-bun-store.firebaseapp.com",
+        projectId: "habbat-bun-store",
+        storageBucket: "habbat-bun-store.firebasestorage.app",
+        messagingSenderId: "685516631891",
+        appId: "1:685516631891:web:947262df61561c2dabfba6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // دالة الحفظ
+    async function save() {
         const name = document.getElementById('p-name').value;
         const price = document.getElementById('p-price').value;
         const oldPrice = document.getElementById('p-old').value;
         const status = document.getElementById('p-status').value;
         const cat = document.getElementById('p-cat').value;
-        const weight = document.getElementById('p-weight').value; // الخانة الجديدة
+        const weight = document.getElementById('p-weight').value;
 
-        if(!name || !price) return alert("املا البيانات يا هندسة");
+        if (!name || !price) return alert("يا هندسة لازم تكتب الاسم والسعر!");
 
-        db.collection("products").doc(name).set({
-            name, 
-            price: parseInt(price), 
-            oldPrice: oldPrice ? parseInt(oldPrice) : null,
-            status, 
-            category: cat,
-            weight: weight // حفظ الوزن في السيرفر
-        }).then(() => {
-            alert("تم التحديث بنجاح!");
-        });
+        try {
+            await db.collection("products").doc(name).set({
+                name: name,
+                price: parseInt(price),
+                oldPrice: oldPrice ? parseInt(oldPrice) : null,
+                status: status,
+                category: cat,
+                weight: weight
+            });
+            alert("تم حفظ " + name + " بنجاح!");
+        } catch (e) {
+            alert("حصل خطأ: " + e.message);
+        }
+    }
+
+    // دالة الرفع السريع
+    async function fastUpload() {
+        const initialMenu = [
+            {name: "بن اسبيشيال فاتح", price: 140, oldPrice: 160, category: "coffee", weight: "ربع كيلو", status: "available"},
+            {name: "بن روقان وسط", price: 150, oldPrice: 180, category: "coffee", weight: "ربع كيلو", status: "available"}
+        ];
+
+        for(let item of initialMenu) {
+            await db.collection("products").doc(item.name).set(item);
+        }
+        alert("تم رفع المنيو الأساسية بنجاح!");
     }
 </script>
+
+</body>
+</html>
